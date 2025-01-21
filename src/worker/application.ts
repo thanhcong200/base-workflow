@@ -72,7 +72,5 @@ export class Application {
             });
     }
 
-    private static registerEvents() {
-     
-    }
+    private static registerEvents() {}
 }

@@ -1,4 +1,4 @@
-import logger from '@common/logger'
+import logger from '@common/logger';
 import { IJobCreateLog } from '@common/queue/job-interface';
 import { QueueService } from '@common/queue/queue.service';
 import { JOB_CREATE_LOG_WORKFLOW as JOB_NAME } from '@config/jobs';
@@ -15,7 +15,7 @@ export class JobCreateLogWorkflow {
     static async handler(job: Job<IJobCreateLog>, done: DoneCallback): Promise<void> {
         try {
             logger.debug(`Process job ${JOB_NAME}-${job.id}`);
-            
+
             // handle logs
 
             logger.debug(`Processed job ${JOB_NAME}-${job.id}`);
