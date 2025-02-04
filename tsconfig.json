@@ -2,6 +2,9 @@
     "compilerOptions": {
         "module": "commonjs",
         "esModuleInterop": true,
+         "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "useDefineForClassFields": false,
         "target": "ESNext",
         "noImplicitAny": false,
         "moduleResolution": "node",

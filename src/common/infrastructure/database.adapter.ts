@@ -1,48 +1,53 @@
-import mongoose, { ConnectionOptions } from 'mongoose';
-import bluebird from 'bluebird';
 import logger from '@common/logger';
-import { LOG_LEVEL, MONGODB_URI } from '@config/environment';
-import { LOG_OUTPUT_JSON } from '@config/environment';
-
-mongoose.Promise = bluebird;
-if (LOG_LEVEL === 'debug') {
-    if (LOG_OUTPUT_JSON) {
-        mongoose.set('debug', (collectionName, method, query, doc) => {
-            logger.debug(`Mongoose: ${collectionName}.${method}`, { stringData: JSON.stringify(query) });
-        });
-    } else {
-        mongoose.set('debug', true);
-    }
-}
+import { TicketLog } from '@common/workflow/entities/ticket-log.entity';
+import { WorkflowTicket } from '@common/workflow/entities/ticket.entity';
+import { WorkflowLog } from '@common/workflow/entities/workflow-log.entity';
+import { WorkflowTicketWorkflowLnk } from '@common/workflow/entities/workflow-ticket-lnk.entity';
+import { EdaWorkflow } from '@common/workflow/entities/workflow.entity';
+import { DataSource } from 'typeorm';
 
 /**
  * Singleton Database client
  */
 export class DatabaseAdapter {
-    static async connect(): Promise<void> {
-        try {
-            const options: ConnectionOptions = {
-                useNewUrlParser: true,
-                useCreateIndex: true,
-                useFindAndModify: false,
-                useUnifiedTopology: true,
-                keepAlive: true,
-            };
-            await mongoose.connect(MONGODB_URI, options);
-            logger.info('Connect to mongodb successfully!');
-        } catch (error) {
-            logger.error('Connect to mongodb failed!', error);
-            // Exit process with failure
-            process.exit(1);
+    static instance: DataSource;
+
+    private constructor() {} // Prevent direct instantiation
+
+    public static getInstance(): DataSource {
+        if (!DatabaseAdapter.instance) {
+            DatabaseAdapter.instance = new DataSource({
+                type: 'postgres',
+                host: 'localhost',
+                port: 5432,
+                username: 'fancho',
+                password: '123456aA',
+                database: 'eda',
+                synchronize: false, // Set to false in production
+                logging: true,
+                entities: [EdaWorkflow, WorkflowLog, WorkflowTicket, TicketLog, WorkflowTicketWorkflowLnk], // Adjust path if needed
+                migrations: [],
+                subscribers: [],
+            });
+        }
+        return DatabaseAdapter.instance;
+    }
+
+    public static async connect(): Promise<void> {
+        const dataSource = DatabaseAdapter.getInstance();
+        if (!dataSource.isInitialized) {
+            try {
+                await dataSource.initialize();
+                logger.info('Database connected successfully!');
+            } catch (error) {
+                logger.info('Database connection error:', error);
+            }
         }
     }
 
-    static async disconnect(): Promise<void> {
-        try {
-            await mongoose.disconnect();
-            logger.info('Disconnect from mongodb successfully!');
-        } catch (error) {
-            logger.error('Disconnect from mongodb failed!', error);
-        }
+    public static async disconnect(): Promise<void> {
+        const dataSource = DatabaseAdapter.getInstance();
+        if (dataSource.isInitialized) await dataSource.destroy();
+        logger.info('Database connected successfully!');
     }
 }
