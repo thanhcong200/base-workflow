@@ -1,7 +1,17 @@
-import {  Entity,  PrimaryGeneratedColumn,  Column,  OneToMany, BeforeInsert } from 'typeorm';
+import {
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    OneToMany,
+    BeforeInsert,
+    CreateDateColumn,
+    UpdateDateColumn,
+    BeforeUpdate,
+} from 'typeorm';
 import { WorkflowLog } from './workflow-log.entity';
 import { v4 as uuidv4 } from 'uuid';
-import { WorkflowTicketWorkflowLnk } from './workflow-ticket-lnk.entity';
+import { WorkflowTicketLnk } from './workflow-ticket-lnk.entity';
+import { WorkflowLogLnk } from './workflow-log-lnk.entity';
 
 @Entity('eda_workflows')
 export class EdaWorkflow {
@@ -33,16 +43,34 @@ export class EdaWorkflow {
     @Column({ type: 'jsonb', nullable: true })
     edges: any;
 
-    @OneToMany(() => WorkflowTicketWorkflowLnk, (lnk) => lnk.workflow)
-    ticketsLink: WorkflowTicketWorkflowLnk[];
+    @OneToMany(() => WorkflowTicketLnk, (lnk) => lnk.workflow)
+    ticket_lnks: WorkflowTicketLnk[];
 
-    @OneToMany(() => WorkflowLog, (log) => log.workflow)
-    logs: WorkflowLog[];
+    @OneToMany(() => WorkflowLogLnk, (log) => log.workflow)
+    workflow_log_lnks: WorkflowLogLnk[];
+
+    @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    created_at: Date;
+
+    @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+    updated_at: Date;
 
     @BeforeInsert()
     generateUUID() {
         if (!this.document_id) {
             this.document_id = uuidv4();
         }
+
+        if (!this.created_at) {
+            this.created_at = new Date();
+        }
+        if (!this.updated_at) {
+            this.updated_at = new Date();
+        }
+    }
+
+    @BeforeUpdate()
+    updateUpdateAt() {
+        this.updated_at = new Date();
     }
 }

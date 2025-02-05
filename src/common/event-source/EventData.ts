@@ -82,7 +82,7 @@ export class EventData implements IEventData {
 
     static newFrom(data: any): EventData {
         return new EventData({
-            id: new Types.ObjectId(data.id),
+            id: new Types.ObjectId(),
             event: data.event,
             topic: data.topic,
             key: data.key,
@@ -97,7 +97,7 @@ export class EventData implements IEventData {
 
     transform(): IEventDataResponse {
         const transformed: IEventDataResponse = {
-            id: this.id.toHexString(),
+            id: this.id.toString(),
             event: this.event,
             topic: this.topic,
             key: this.key,

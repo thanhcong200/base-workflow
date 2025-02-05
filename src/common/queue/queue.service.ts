@@ -1,5 +1,6 @@
 import { RedisAdapter } from '@common/infrastructure/redis.adapter';
 import logger from '@common/logger';
+import { APP_NAME } from '@config/environment';
 import BullQueue, { JobStatusClean, Queue } from 'bull';
 
 export class QueueService {
@@ -8,7 +9,13 @@ export class QueueService {
     static async getQueue<T = unknown>(jobName: string): Promise<Queue<T>> {
         let queue = QueueService.queues.get(jobName);
         if (!queue) {
-            queue = new BullQueue<T>(jobName, await RedisAdapter.getQueueOptions());
+            queue = new BullQueue<T>(jobName, {
+                prefix: `${APP_NAME}:jobs:`,
+                defaultJobOptions: {
+                    removeOnComplete: 1000,
+                    removeOnFail: 1000,
+                },
+            });
             queue.on('failed', (job, error) => {
                 logger.error('Failed process job', { error, data: job });
             });

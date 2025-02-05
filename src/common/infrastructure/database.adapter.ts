@@ -1,8 +1,10 @@
 import logger from '@common/logger';
+import { TicketLogLnk } from '@common/workflow/entities/ticket-log-lnk.entity';
 import { TicketLog } from '@common/workflow/entities/ticket-log.entity';
 import { WorkflowTicket } from '@common/workflow/entities/ticket.entity';
+import { WorkflowLogLnk } from '@common/workflow/entities/workflow-log-lnk.entity';
 import { WorkflowLog } from '@common/workflow/entities/workflow-log.entity';
-import { WorkflowTicketWorkflowLnk } from '@common/workflow/entities/workflow-ticket-lnk.entity';
+import { WorkflowTicketLnk } from '@common/workflow/entities/workflow-ticket-lnk.entity';
 import { EdaWorkflow } from '@common/workflow/entities/workflow.entity';
 import { DataSource } from 'typeorm';
 
@@ -25,7 +27,7 @@ export class DatabaseAdapter {
                 database: 'eda',
                 synchronize: false, // Set to false in production
                 logging: true,
-                entities: [EdaWorkflow, WorkflowLog, WorkflowTicket, TicketLog, WorkflowTicketWorkflowLnk], // Adjust path if needed
+                entities: [EdaWorkflow, WorkflowLog, WorkflowTicket, TicketLog, WorkflowLogLnk, WorkflowTicketLnk, TicketLogLnk], // Adjust path if needed
                 migrations: [],
                 subscribers: [],
             });

@@ -89,7 +89,7 @@ export class KafkaAdapter {
                         value: JSON.stringify(eventData.transform()),
                         headers: {
                             event: eventData.event,
-                            id: eventData.id.toHexString(),
+                            id: eventData.id.toString(),
                         },
                     },
                 ],

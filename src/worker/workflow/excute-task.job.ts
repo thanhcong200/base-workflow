@@ -1,6 +1,7 @@
 import logger from '@common/logger';
 import { IJobExcuteTaskWorkflow } from '@common/queue/job-interface';
 import { QueueService } from '@common/queue/queue.service';
+import ticketService from '@common/workflow/ticket.service';
 import { JOB_EXCUTE_TASK_WORKFLOW as JOB_NAME } from '@config/jobs';
 import { Job, DoneCallback, Queue } from 'bull';
 import _ from 'lodash';
@@ -14,7 +15,13 @@ export class JobExcuteTaskWorkflow {
     }
     static async handler(job: Job<IJobExcuteTaskWorkflow>, done: DoneCallback): Promise<void> {
         try {
-            logger.debug(`Process job ${JOB_NAME}-${job.id}`);
+            logger.debug(`Process job ${JOB_NAME}-${job.id}}`);
+            await ticketService.excuteFunction(job.data.excute_function_name, job.data.input)
+            // await(await QueueService.getQueue<IJobExcuteTaskWorkflow>(JOB_NAME)).add({
+            //     ticket_id: '2',
+            //     excute_function_name: 'sendNoti',
+            //     input: { username: 'cong' },
+            // });
 
             // excute task
 
